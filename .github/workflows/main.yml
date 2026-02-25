@@ -1,0 +1,33 @@
+name: Sync Ubuntu to Harbor
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Automatically runs every day at midnight
+  workflow_dispatch: {}     # Allows you to run it manually from the Actions tab
+
+jobs:
+  sync-ubuntu:
+    runs-on: ubuntu-latest # Uses a standard GitHub-hosted runner
+    steps:
+      - name: Install Skopeo
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y skopeo # Skopeo is used for direct registry-to-registry copying
+
+      - name: Sync Ubuntu Tags
+        env:
+          HARBOR_USER: ${{ secrets.HARBOR_USERNAME }}
+          HARBOR_PWD: ${{ secrets.HARBOR_PASSWORD }}
+          HARBOR_HOST: ${{ secrets.HARBOR_DOMAIN }}
+        run: |
+          # Define the specific tags you need
+          TAGS=("22.04_stable" "24.04_stable")
+          
+          for TAG in "${TAGS[@]}"; do
+            echo "Syncing tag: $TAG"
+            # Skopeo copy --all ensures all architectures (amd64, arm64, etc.) are moved
+            skopeo copy --all \
+              --dest-creds "$HARBOR_USER:$HARBOR_PWD" \
+              docker://public.ecr.aws/docker/library/ubuntu:$TAG \
+              docker://$HARBOR_HOST/library/ubuntu:$TAG
+          done
