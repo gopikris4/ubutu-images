@@ -20,14 +20,14 @@ jobs:
           HARBOR_PWD: ${{ secrets.HARBOR_PASSWORD }}
           HARBOR_HOST: ${{ secrets.HARBOR_DOMAIN }}
         run: |
-          # Define the specific tags you need
           TAGS=("22.04_stable" "24.04_stable")
-          
           for TAG in "${TAGS[@]}"; do
-            echo "Syncing tag: $TAG"
-            # Skopeo copy --all ensures all architectures (amd64, arm64, etc.) are moved
-            skopeo copy --all \
+            echo "Attempting to sync $TAG..."
+            # Added --debug and --dest-tls-verify=false (if using self-signed certs)
+            skopeo --debug copy --all \
               --dest-creds "$HARBOR_USER:$HARBOR_PWD" \
+              --dest-tls-verify=false \
               docker://public.ecr.aws/docker/library/ubuntu:$TAG \
               docker://$HARBOR_HOST/library/ubuntu:$TAG
           done
+
