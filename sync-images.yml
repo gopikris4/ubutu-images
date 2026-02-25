@@ -3,7 +3,7 @@ name: Sync Ubuntu to Harbor
 on:
   schedule:
     - cron: '0 0 * * *' # Automatically runs every day at midnight
-  workflow_dispatch:    # Allows you to run it manually from the Actions tab
+  workflow_dispatch: {}   # Allows you to run it manually from the Actions tab
 
 jobs:
   sync-ubuntu:
