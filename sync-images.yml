@@ -22,9 +22,9 @@ jobs:
         run: |
           TAGS=("22.04_stable" "24.04_stable")
           for TAG in "${TAGS[@]}"; do
-            echo "Attempting to sync $TAG..."
-            # Added --debug and --dest-tls-verify=false (if using self-signed certs)
-            skopeo --debug copy --all \
+            echo "Attempting to sync Ubuntu $TAG..."
+            # Note the '=' in --dest-tls-verify=false
+            skopeo copy --all \
               --dest-creds "$HARBOR_USER:$HARBOR_PWD" \
               --dest-tls-verify=false \
               docker://public.ecr.aws/docker/library/ubuntu:$TAG \
